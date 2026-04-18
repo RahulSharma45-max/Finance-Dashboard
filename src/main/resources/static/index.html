@@ -209,7 +209,7 @@
 
             </div>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
-                Test who can view financial analytics. VIEWER should be denied. (Assuming User ID 1 exists).
+                Check who can view financial analytics. 
             </p>
             <div class="controls">
                 <select id="dash-role-select">
@@ -221,7 +221,7 @@
             </div>
             <div class="response-container">
                 <span id="status-dash" class="status-badge"></span>
-                <pre id="response-dash">Select a role and click view...</pre>
+                <pre id="response-dash">First select a role !</pre>
             </div>
         </div>
 
@@ -231,7 +231,7 @@
                 <div class="card-title">Create Data <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">POST /api/users</span></div>
             </div>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
-                Attempt to create a user. Pick your "Sender Role" to see if the system allows you to do it! Only ADMIN should succeed.
+                Tries to create a user. (Only Admin is allowed to do)
             </p>
             <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <select id="post-sender-role">
@@ -252,7 +252,7 @@
             </div>
             <div class="response-container">
                 <span id="status-create" class="status-badge"></span>
-                <pre id="response-create">Fill the form and click submit...</pre>
+                <pre id="response-create">Fill all the details to see  :)</pre>
             </div>
         </div>
 
@@ -262,7 +262,7 @@
                 <div class="card-title">Add Finance Record <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">POST /api/records</span></div>
             </div>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
-                Add Income or Expenses to change your dashboard numbers! (Requires ADMIN or ANALYST role).
+               Add your income or exprenses.
             </p>
             <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <select id="rec-sender-role">
@@ -284,7 +284,7 @@
             </div>
             <div class="response-container">
                 <span id="status-record" class="status-badge"></span>
-                <pre id="response-record">Fill the form and click submit...</pre>
+                <pre id="response-record">Fill all the details to see  :)</pre>
             </div>
         </div>
 
@@ -305,7 +305,7 @@
             </div>
             <div class="response-container">
                 <span id="status-users" class="status-badge"></span>
-                <pre id="response-users">Select a role and click fetch...</pre>
+                <pre id="response-users">Select a role !</pre>
             </div>
         </div>
         
@@ -321,7 +321,7 @@
             </div>
             <div class="response-container">
                 <span id="status-test" class="status-badge"></span>
-                <pre id="response-test">Click the button to send a request...</pre>
+                <pre id="response-test">Click the button!</pre>
             </div>
         </div>
     </div>
