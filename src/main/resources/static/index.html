@@ -202,13 +202,12 @@
     </header>
 
     <div class="container">
-        <!-- Health Check Component -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Health Check <span class="badge">GET /api/test</span></div>
             </div>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
-                A simple endpoint to verify if the server is running. No authentication headers required.
+               Simple Verification to check if backend is running or not!
             </p>
             <div class="controls">
                 <button id="btn-test" onclick="runTest()">Run Health Check</button>
@@ -219,25 +218,50 @@
             </div>
         </div>
 
-        <!-- Fetch Users Component -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Database Check <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">GET /api/users</span></div>
             </div>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
-                Fetch a list of users directly from your Aiven MySQL database. Secretly sends the 'X-User-Role' header behind the scenes!
+               API Testing!!
             </p>
             <div class="controls">
                 <select id="role-select">
-                    <option value="ADMIN">Header Role: ADMIN</option>
-                    <option value="ANALYST">Header Role: ANALYST</option>
-                    <option value="VIEWER">Header Role: VIEWER</option>
+                    <p>Select your Role:-</p>
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="ANALYST">ANALYST</option>
+                    <option value="VIEWER">VIEWER</option>
                 </select>
                 <button id="btn-users" onclick="runUsers()" style="background: #10b981;">Fetch Records</button>
             </div>
             <div class="response-container">
                 <span id="status-users" class="status-badge"></span>
                 <pre id="response-users">Select a role and click fetch...</pre>
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Create Data <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">POST /api/users</span></div>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                Add a completely new user to your Aiven database. Requires ADMIN role to authorize!
+            </p>
+            <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <input type="text" id="post-username" placeholder="Username (e.g. max_power)" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                <input type="email" id="post-email" placeholder="Email Address" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                <input type="password" id="post-password" placeholder="Password" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                <select id="post-role">
+                    <option value="ANALYST">Appoint Role: ANALYST</option>
+                    <option value="VIEWER">Appoint Role: VIEWER</option>
+                    <option value="ADMIN">Appoint Role: ADMIN</option>
+                </select>
+                <button id="btn-create" onclick="createUser()" style="grid-column: span 2;">Submit & Create Data</button>
+            </div>
+            <div class="response-container">
+                <span id="status-create" class="status-badge"></span>
+                <pre id="response-create">Fill the form and click submit...</pre>
             </div>
         </div>
     </div>
@@ -249,7 +273,7 @@
             const statusEl = document.getElementById(statusId);
             
             btn.classList.add('loading');
-            statusEl.className = 'status-badge'; // Reset status
+            statusEl.className = 'status-badge';
             
             try {
                 const start = performance.now();
@@ -282,6 +306,52 @@
         function runUsers() {
             const role = document.getElementById('role-select').value;
             executeRequest('/api/users', 'GET', { 'X-User-Role': role }, 'btn-users', 'response-users', 'status-users');
+        }
+
+        async function createUser() {
+            const btn = document.getElementById('btn-create');
+            const responseEl = document.getElementById('response-create');
+            const statusEl = document.getElementById('status-create');
+            
+            const reqBody = {
+                username: document.getElementById('post-username').value,
+                email: document.getElementById('post-email').value,
+                password: document.getElementById('post-password').value,
+                role: document.getElementById('post-role').value
+            };
+
+            btn.classList.add('loading');
+            statusEl.className = 'status-badge'; 
+            
+            try {
+                const start = performance.now();
+                const res = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Role': 'ADMIN'
+                    },
+                    body: JSON.stringify(reqBody)
+                });
+                const end = performance.now();
+                
+                statusEl.textContent = `${res.status} ${res.ok ? 'OK' : 'Error'} (${Math.round(end - start)}ms)`;
+                statusEl.className = res.ok ? 'status-badge status-success' : 'status-badge status-error';
+                
+                const text = await res.text();
+                try {
+                    const json = JSON.parse(text);
+                    responseEl.textContent = JSON.stringify(json, null, 2);
+                } catch {
+                    responseEl.textContent = text || '<Empty Response>';
+                }
+            } catch (error) {
+                statusEl.textContent = 'Connection Failed';
+                statusEl.className = 'status-badge status-error';
+                responseEl.textContent = error.toString();
+            } finally {
+                btn.classList.remove('loading');
+            }
         }
     </script>
 </body>
