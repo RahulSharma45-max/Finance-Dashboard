@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard API Explorer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --surface-color: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1.5rem;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.1), transparent 25%);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: grid;
+            gap: 1.5rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border-radius: 999px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        select {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+        }
+
+        button:hover { background: var(--primary-hover); }
+        button:active { transform: scale(0.95); }
+        
+        button.loading {
+            color: transparent;
+            position: relative;
+            pointer-events: none;
+        }
+
+        button.loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0; left: 0; right: 0; bottom: 0;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s ease infinite;
+        }
+
+        .response-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+            overflow-x: auto;
+            min-height: 80px;
+        }
+
+        pre {
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .status-success { background: rgba(16, 185, 129, 0.2); color: #34d399; display: block;}
+        .status-error { background: rgba(239, 68, 68, 0.2); color: #f87171; display: block;}
+
+        @keyframes spin { from { transform: rotate(0turn); } to { transform: rotate(1turn); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>API Explorer</h1>
+        <p class="subtitle">Live Backend Status & Testing Interface</p>
+    </header>
+
+    <div class="container">
+        <!-- Health Check Component -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Health Check <span class="badge">GET /api/test</span></div>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                A simple endpoint to verify if the server is running. No authentication headers required.
+            </p>
+            <div class="controls">
+                <button id="btn-test" onclick="runTest()">Run Health Check</button>
+            </div>
+            <div class="response-container">
+                <span id="status-test" class="status-badge"></span>
+                <pre id="response-test">Click the button to send a request...</pre>
+            </div>
+        </div>
+
+        <!-- Fetch Users Component -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Database Check <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">GET /api/users</span></div>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                Fetch a list of users directly from your Aiven MySQL database. Secretly sends the 'X-User-Role' header behind the scenes!
+            </p>
+            <div class="controls">
+                <select id="role-select">
+                    <option value="ADMIN">Header Role: ADMIN</option>
+                    <option value="USER">Header Role: USER</option>
+                </select>
+                <button id="btn-users" onclick="runUsers()" style="background: #10b981;">Fetch Records</button>
+            </div>
+            <div class="response-container">
+                <span id="status-users" class="status-badge"></span>
+                <pre id="response-users">Select a role and click fetch...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function executeRequest(url, method, headers, btnId, responseId, statusId) {
+            const btn = document.getElementById(btnId);
+            const responseEl = document.getElementById(responseId);
+            const statusEl = document.getElementById(statusId);
+            
+            btn.classList.add('loading');
+            statusEl.className = 'status-badge'; // Reset status
+            
+            try {
+                const start = performance.now();
+                const res = await fetch(url, { method, headers });
+                const end = performance.now();
+                
+                statusEl.textContent = `${res.status} ${res.ok ? 'OK' : 'Error'} (${Math.round(end - start)}ms)`;
+                statusEl.className = res.ok ? 'status-badge status-success' : 'status-badge status-error';
+                
+                const text = await res.text();
+                try {
+                    const json = JSON.parse(text);
+                    responseEl.textContent = JSON.stringify(json, null, 2);
+                } catch {
+                    responseEl.textContent = text || '<Empty Response. Success!>';
+                }
+            } catch (error) {
+                statusEl.textContent = 'Connection Failed';
+                statusEl.className = 'status-badge status-error';
+                responseEl.textContent = error.toString();
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+
+        function runTest() {
+            executeRequest('/api/test', 'GET', {}, 'btn-test', 'response-test', 'status-test');
+        }
+
+        function runUsers() {
+            const role = document.getElementById('role-select').value;
+            executeRequest('/api/users', 'GET', { 'X-User-Role': role }, 'btn-users', 'response-users', 'status-users');
+        }
+    </script>
+</body>
+</html>
