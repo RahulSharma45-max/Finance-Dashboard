@@ -202,45 +202,30 @@
     </header>
 
     <div class="container">
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Health Check <span class="badge">GET /api/test</span></div>
-            </div>
-            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
-               Simple Verification to check if backend is running or not!
-            </p>
-            <div class="controls">
-                <button id="btn-test" onclick="runTest()">Run Health Check</button>
-            </div>
-            <div class="response-container">
-                <span id="status-test" class="status-badge"></span>
-                <pre id="response-test">Click the button to send a request...</pre>
-            </div>
-        </div>
 
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Database Check <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">GET /api/users</span></div>
+                <div class="card-title">Dashboard Summary <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">GET /api/dashboard/summary</span></div>
+
             </div>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
-               API Testing!!
+                Test who can view financial analytics. VIEWER should be denied. (Assuming User ID 1 exists).
             </p>
             <div class="controls">
-                <select id="role-select">
-                    <p>Select your Role:-</p>
-                    <option value="ADMIN">ADMIN</option>
-                    <option value="ANALYST">ANALYST</option>
-                    <option value="VIEWER">VIEWER</option>
+                <select id="dash-role-select">
+                    <option value="ADMIN">Header Role: ADMIN</option>
+                    <option value="ANALYST">Header Role: ANALYST</option>
+                    <option value="VIEWER">Header Role: VIEWER</option>
                 </select>
-                <button id="btn-users" onclick="runUsers()" style="background: #10b981;">Fetch Records</button>
+                <button id="btn-dash" onclick="runDashboard()" style="background: #fbbf24; color: #78350f;">View Dashboard</button>
             </div>
             <div class="response-container">
-                <span id="status-users" class="status-badge"></span>
-                <pre id="response-users">Select a role and click fetch...</pre>
+                <span id="status-dash" class="status-badge"></span>
+                <pre id="response-dash">Select a role and click view...</pre>
             </div>
         </div>
 
-        <!-- Create User Component -->
+
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Create Data <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">POST /api/users</span></div>
@@ -271,25 +256,72 @@
             </div>
         </div>
 
-        <!-- Dashboard Component -->
+
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Dashboard Summary <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">GET /api/dashboard/summary</span></div>
+                <div class="card-title">Add Finance Record <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">POST /api/records</span></div>
             </div>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
-                Test who can view financial analytics. VIEWER should be denied. (Assuming User ID 1 exists).
+                Add Income or Expenses to change your dashboard numbers! (Requires ADMIN or ANALYST role).
             </p>
-            <div class="controls">
-                <select id="dash-role-select">
-                    <option value="ADMIN">Header Role: ADMIN</option>
-                    <option value="ANALYST">Header Role: ANALYST</option>
-                    <option value="VIEWER">Header Role: VIEWER</option>
+            <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <select id="rec-sender-role">
+                    <option value="ADMIN">Sender Role: ADMIN</option>
+                    <option value="ANALYST">Sender Role: ANALYST</option>
+                    <option value="VIEWER">Sender Role: VIEWER</option>
                 </select>
-                <button id="btn-dash" onclick="runDashboard()" style="background: #fbbf24; color: #78350f;">View Dashboard</button>
+                <select id="rec-type">
+                    <option value="INCOME">Type: INCOME</option>
+                    <option value="EXPENSE">Type: EXPENSE</option>
+                </select>
+                <input type="number" id="rec-userid" placeholder="User ID (e.g. 1)" value="1" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                <input type="number" step="0.01" id="rec-amount" placeholder="Amount (e.g. 50.50)" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                <input type="text" id="rec-category" placeholder="Category (e.g. Groceries)" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                <input type="date" id="rec-date" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                <input type="text" id="rec-notes" placeholder="Notes (Optional)" style="grid-column: span 2; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                
+                <button id="btn-record" onclick="createRecord()" style="grid-column: span 2; background: #34d399; color: #064e3b;">Submit Financial Record</button>
             </div>
             <div class="response-container">
-                <span id="status-dash" class="status-badge"></span>
-                <pre id="response-dash">Select a role and click view...</pre>
+                <span id="status-record" class="status-badge"></span>
+                <pre id="response-record">Fill the form and click submit...</pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Database Check <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">GET /api/users</span></div>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+               API Testing!!
+            </p>
+            <div class="controls">
+                <select id="role-select">
+                    <option value="ADMIN">Select your Role: ADMIN</option>
+                    <option value="ANALYST">Select your Role: ANALYST</option>
+                    <option value="VIEWER">Select your Role: VIEWER</option>
+                </select>
+                <button id="btn-users" onclick="runUsers()" style="background: #10b981;">Fetch Records</button>
+            </div>
+            <div class="response-container">
+                <span id="status-users" class="status-badge"></span>
+                <pre id="response-users">Select a role and click fetch...</pre>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Health Check <span class="badge">GET /api/test</span></div>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+               Simple Verification to check if backend is running or not!
+            </p>
+            <div class="controls">
+                <button id="btn-test" onclick="runTest()">Run Health Check</button>
+            </div>
+            <div class="response-container">
+                <span id="status-test" class="status-badge"></span>
+                <pre id="response-test">Click the button to send a request...</pre>
             </div>
         </div>
     </div>
@@ -338,7 +370,6 @@
         
         function runDashboard() {
             const role = document.getElementById('dash-role-select').value;
-            // Attempt to fetch dashboard for user ID 1
             executeRequest('/api/dashboard/summary?userId=1', 'GET', { 'X-User-Role': role }, 'btn-dash', 'response-dash', 'status-dash');
         }
 
@@ -361,6 +392,54 @@
             try {
                 const start = performance.now();
                 const res = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Role': senderRole
+                    },
+                    body: JSON.stringify(reqBody)
+                });
+                const end = performance.now();
+                
+                statusEl.textContent = `${res.status} ${res.ok ? 'OK' : 'Error'} (${Math.round(end - start)}ms)`;
+                statusEl.className = res.ok ? 'status-badge status-success' : 'status-badge status-error';
+                
+                const text = await res.text();
+                try {
+                    const json = JSON.parse(text);
+                    responseEl.textContent = JSON.stringify(json, null, 2);
+                } catch {
+                    responseEl.textContent = text || '<Empty Response>';
+                }
+            } catch (error) {
+                statusEl.textContent = 'Connection Failed';
+                statusEl.className = 'status-badge status-error';
+                responseEl.textContent = error.toString();
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+        async function createRecord() {
+            const btn = document.getElementById('btn-record');
+            const responseEl = document.getElementById('response-record');
+            const statusEl = document.getElementById('status-record');
+            const senderRole = document.getElementById('rec-sender-role').value;
+            
+            const reqBody = {
+                userId: parseInt(document.getElementById('rec-userid').value),
+                amount: parseFloat(document.getElementById('rec-amount').value),
+                type: document.getElementById('rec-type').value,
+                category: document.getElementById('rec-category').value,
+                date: document.getElementById('rec-date').value,
+                notes: document.getElementById('rec-notes').value
+            };
+
+            btn.classList.add('loading');
+            statusEl.className = 'status-badge'; 
+            
+            try {
+                const start = performance.now();
+                const res = await fetch('/api/records', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

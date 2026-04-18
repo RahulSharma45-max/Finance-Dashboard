@@ -6,6 +6,11 @@ The Finance Dashboard is a backend REST API designed for managing users, financi
 
 This application is configured for **Cloud Deployment** using Docker on **Render**, connected to a cloud-based **Aiven MySQL Database**.
 
+### 🏗️ Architecture & Separation of Concerns
+This project strictly follows a **Client-Server Architecture**:
+- **The Brain (Java Backend):** All business logic, database queries, mathematical calculations (for the dashboard), and security rules (Roles) live exclusively in the Java Spring Boot code.
+- **The Remote (HTML Frontend):** The `index.html` file serves purely as an API testing interface. It contains no core logic or power of its own; it simply sends HTTP requests to the Java backend and displays the responses.
+
 ### 🛠️ Tech Stack
 - **Backend Framework:** Java 17, Spring Boot 3
 - **Data Access:** Spring Data JPA, Hibernate
