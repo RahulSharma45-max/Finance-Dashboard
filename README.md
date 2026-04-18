@@ -87,3 +87,5 @@ If you don't wish to test the live Render deployment, you can run it locally:
 - `PATCH /api/users/{id}/role?newRole={role}` - Update User Role
 - `PATCH /api/users/{id}/status?newStatus={status}` - Update User Status
 - `DELETE /api/users/{id}` - Delete a User
+
+Live :- https://finance-dashboard-9xom.onrender.com/
