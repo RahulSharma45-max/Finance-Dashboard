@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
         error.put("timestamp", LocalDateTime.now().toString());
         error.put("status", 500);
         error.put("error", "Internal Server Error");
-        error.put("message", "Something went wrong. Please try again later.");
+        error.put("message", ex.getMessage() != null ? ex.getMessage() : "Unknown Server Error");
         System.err.println("Unexpected error: " + ex.getMessage());
         ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
