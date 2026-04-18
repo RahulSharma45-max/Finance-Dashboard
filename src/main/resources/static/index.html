@@ -240,28 +240,56 @@
             </div>
         </div>
 
-
+        <!-- Create User Component -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Create Data <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">POST /api/users</span></div>
             </div>
             <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
-                Add a completely new user to your Aiven database. Requires ADMIN role to authorize!
+                Attempt to create a user. Pick your "Sender Role" to see if the system allows you to do it! Only ADMIN should succeed.
             </p>
             <div class="controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <input type="text" id="post-username" placeholder="Username (e.g. max_power)" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
-                <input type="email" id="post-email" placeholder="Email Address" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
-                <input type="password" id="post-password" placeholder="Password" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
-                <select id="post-role">
-                    <option value="ANALYST">Appoint Role: ANALYST</option>
-                    <option value="VIEWER">Appoint Role: VIEWER</option>
-                    <option value="ADMIN">Appoint Role: ADMIN</option>
+                <select id="post-sender-role">
+                    <option value="ADMIN">Sender Role: ADMIN</option>
+                    <option value="ANALYST">Sender Role: ANALYST</option>
+                    <option value="VIEWER">Sender Role: VIEWER</option>
                 </select>
-                <button id="btn-create" onclick="createUser()" style="grid-column: span 2;">Submit & Create Data</button>
+                <select id="post-role">
+                    <option value="ANALYST">Assign Role: ANALYST</option>
+                    <option value="VIEWER">Assign Role: VIEWER</option>
+                    <option value="ADMIN">Assign Role: ADMIN</option>
+                </select>
+                <input type="text" id="post-username" placeholder="Username" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                <input type="email" id="post-email" placeholder="Email" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                <input type="password" id="post-password" placeholder="Password" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.75rem 1rem; border-radius: 8px; outline: none; width: 100%;">
+                
+                <button id="btn-create" onclick="createUser()" style="grid-column: span 2;">Submit POST Request</button>
             </div>
             <div class="response-container">
                 <span id="status-create" class="status-badge"></span>
                 <pre id="response-create">Fill the form and click submit...</pre>
+            </div>
+        </div>
+
+        <!-- Dashboard Component -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Dashboard Summary <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">GET /api/dashboard/summary</span></div>
+            </div>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                Test who can view financial analytics. VIEWER should be denied. (Assuming User ID 1 exists).
+            </p>
+            <div class="controls">
+                <select id="dash-role-select">
+                    <option value="ADMIN">Header Role: ADMIN</option>
+                    <option value="ANALYST">Header Role: ANALYST</option>
+                    <option value="VIEWER">Header Role: VIEWER</option>
+                </select>
+                <button id="btn-dash" onclick="runDashboard()" style="background: #fbbf24; color: #78350f;">View Dashboard</button>
+            </div>
+            <div class="response-container">
+                <span id="status-dash" class="status-badge"></span>
+                <pre id="response-dash">Select a role and click view...</pre>
             </div>
         </div>
     </div>
@@ -273,7 +301,7 @@
             const statusEl = document.getElementById(statusId);
             
             btn.classList.add('loading');
-            statusEl.className = 'status-badge';
+            statusEl.className = 'status-badge'; 
             
             try {
                 const start = performance.now();
@@ -307,11 +335,18 @@
             const role = document.getElementById('role-select').value;
             executeRequest('/api/users', 'GET', { 'X-User-Role': role }, 'btn-users', 'response-users', 'status-users');
         }
+        
+        function runDashboard() {
+            const role = document.getElementById('dash-role-select').value;
+            // Attempt to fetch dashboard for user ID 1
+            executeRequest('/api/dashboard/summary?userId=1', 'GET', { 'X-User-Role': role }, 'btn-dash', 'response-dash', 'status-dash');
+        }
 
         async function createUser() {
             const btn = document.getElementById('btn-create');
             const responseEl = document.getElementById('response-create');
             const statusEl = document.getElementById('status-create');
+            const senderRole = document.getElementById('post-sender-role').value;
             
             const reqBody = {
                 username: document.getElementById('post-username').value,
@@ -329,7 +364,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-User-Role': 'ADMIN'
+                        'X-User-Role': senderRole
                     },
                     body: JSON.stringify(reqBody)
                 });
